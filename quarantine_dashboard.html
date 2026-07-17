@@ -1,0 +1,2202 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Dashboard Gestión de Cuarentena Planta 1</title>
+    <style>
+      :root {
+        --navy: #071525;
+        --panel: #0e2238;
+        --blue: #2188ff;
+        --cyan: #5bc0ff;
+        --text: #eef7ff;
+        --muted: #9fb4c9;
+        --line: #27435f;
+        --ok: #32d583;
+        --warn: #fdb022;
+        --bad: #f97066;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background:
+          radial-gradient(circle at 90% 0, #11385a 0, transparent 28%),
+          var(--navy);
+        color: var(--text);
+        font:
+          16px system-ui,
+          -apple-system,
+          Segoe UI,
+          sans-serif;
+      }
+      .top {
+        padding: 20px clamp(16px, 4vw, 48px);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--line);
+        background: #071525e8;
+        position: sticky;
+        top: 0;
+        z-index: 5;
+      }
+      .brand {
+        display: flex;
+        gap: 13px;
+        align-items: center;
+      }
+      .mark {
+        width: 43px;
+        height: 43px;
+        border-radius: 13px;
+        background: linear-gradient(135deg, var(--blue), var(--cyan));
+        display: grid;
+        place-items: center;
+        font-weight: 900;
+        font-size: 21px;
+      }
+      .brand h1 {
+        font-size: clamp(18px, 3vw, 25px);
+        margin: 0;
+      }
+      .brand p {
+        margin: 2px 0 0;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .wrap {
+        max-width: 1280px;
+        margin: auto;
+        padding: 24px clamp(14px, 4vw, 42px) 60px;
+      }
+      .card {
+        background: #0e2238ee;
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        padding: clamp(18px, 3vw, 30px);
+        box-shadow: 0 18px 50px #0004;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
+      .full {
+        grid-column: 1/-1;
+      }
+      label {
+        display: block;
+        font-size: 13px;
+        font-weight: 750;
+        color: #cce3f8;
+        margin-bottom: 7px;
+      }
+      input,
+      select,
+      textarea {
+        width: 100%;
+        border: 1px solid #365979;
+        background: #07192b;
+        color: var(--text);
+        border-radius: 12px;
+        padding: 14px;
+        font: inherit;
+        outline: none;
+      }
+      input:focus,
+      select:focus,
+      textarea:focus {
+        border-color: var(--cyan);
+        box-shadow: 0 0 0 3px #2188ff33;
+      }
+      textarea {
+        min-height: 105px;
+        resize: vertical;
+      }
+      .primary,
+      .ghost,
+      .danger {
+        border: 0;
+        border-radius: 13px;
+        padding: 14px 18px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+      .primary {
+        background: linear-gradient(135deg, var(--blue), #36a7ff);
+        color: white;
+      }
+      .ghost {
+        background: #16334f;
+        color: #e8f5ff;
+        border: 1px solid var(--line);
+      }
+      .danger {
+        background: #542528;
+        color: #ffd8d5;
+      }
+      .actions {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+        margin-top: 22px;
+      }
+      .status {
+        font-size: 12px;
+        color: var(--muted);
+        display: flex;
+        gap: 7px;
+        align-items: center;
+      }
+      .dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 99px;
+        background: var(--warn);
+      }
+      .dot.on {
+        background: var(--ok);
+      }
+      .notice {
+        padding: 13px 16px;
+        border-radius: 12px;
+        background: #0b3651;
+        border: 1px solid #1c6a95;
+        color: #d8f2ff;
+        margin-bottom: 18px;
+      }
+      .hidden {
+        display: none !important;
+      }
+      .tabs {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 18px;
+      }
+      .tab {
+        padding: 16px;
+        border-radius: 14px;
+        border: 1px solid var(--line);
+        background: #102a43;
+        color: #bcd2e6;
+        font-weight: 850;
+        cursor: pointer;
+      }
+      .tab.active {
+        background: linear-gradient(135deg, var(--blue), #36a7ff);
+        color: white;
+        border-color: transparent;
+      }
+      .summary {
+        padding: 14px 16px;
+        border: 1px solid #2d587b;
+        background: #0a1d30;
+        border-radius: 14px;
+        margin-top: 12px;
+      }
+      .summary b {
+        display: block;
+        margin-bottom: 4px;
+      }
+      .kpis {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 14px;
+        margin-bottom: 18px;
+      }
+      .kpi {
+        padding: 18px;
+        border-radius: 18px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+      }
+      .kpi b {
+        font-size: 30px;
+        display: block;
+      }
+      .kpi span {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .filters {
+        display: grid;
+        grid-template-columns: 2fr repeat(3, 1fr);
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+      .tablewrap {
+        overflow: auto;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 1050px;
+        background: #0b1c2e;
+      }
+      th,
+      td {
+        padding: 13px 12px;
+        text-align: left;
+        border-bottom: 1px solid #203a53;
+        font-size: 13px;
+      }
+      th {
+        color: #9fc9eb;
+        background: #102a43;
+        position: sticky;
+        top: 0;
+      }
+      td strong {
+        display: block;
+      }
+      .pill {
+        display: inline-block;
+        border-radius: 999px;
+        padding: 5px 9px;
+        font-size: 11px;
+        font-weight: 800;
+        background: #493a16;
+        color: #ffd98c;
+      }
+      .pill.LIBERADO {
+        background: #12472f;
+        color: #83efb9;
+      }
+      .pill.LIBERADO.PARCIAL {
+        background: #1d446b;
+        color: #a8d7ff;
+      }
+      .pill.RECHAZADO {
+        background: #512525;
+        color: #ffaaa5;
+      }
+      .pill.RETRABAJO {
+        background: #233e62;
+        color: #9dd1ff;
+      }
+      .modal {
+        position: fixed;
+        inset: 0;
+        background: #000b;
+        display: grid;
+        place-items: center;
+        padding: 18px;
+        z-index: 10;
+      }
+      .modal .card {
+        width: min(560px, 100%);
+      }
+      .muted {
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .empty {
+        text-align: center;
+        padding: 40px;
+        color: var(--muted);
+      }
+      .chart-panel {
+        display: grid;
+        max-width: 900px;
+        margin: 18px auto 0;
+        grid-template-columns: minmax(170px, 230px) 1fr;
+        gap: 28px;
+        align-items: center;
+        margin-bottom: 18px;
+      }
+      .pie {
+        width: min(190px, 60vw);
+        aspect-ratio: 1;
+        border-radius: 50%;
+        margin: auto;
+        position: relative;
+        box-shadow: 0 12px 35px #0005;
+      }
+      .pie:after {
+        content: "";
+        position: absolute;
+        inset: 27%;
+        border-radius: 50%;
+        background: var(--panel);
+        box-shadow: inset 0 0 0 1px var(--line);
+      }
+      .legend {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 9px;
+        border-radius: 11px;
+        background: #0a1d30;
+      }
+      .swatch {
+        width: 12px;
+        height: 12px;
+        border-radius: 4px;
+        flex: 0 0 auto;
+      }
+      .legend-item b {
+        display: block;
+        font-size: 12px;
+      }
+      .legend-item span {
+        font-size: 11px;
+        color: var(--muted);
+      }
+      .chart-title {
+        margin: 0 0 4px;
+        font-size: 20px;
+      }
+      .chart-subtitle {
+        margin: 0 0 16px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      @media (max-width: 900px) {
+        .kpis {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .chart-panel {
+          grid-template-columns: 1fr;
+        }
+        .legend {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      @media (max-width: 760px) {
+        .grid,
+        .filters {
+          grid-template-columns: 1fr;
+        }
+        .kpis {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .top {
+          position: static;
+        }
+        .actions {
+          flex-direction: column;
+        }
+        .actions button {
+          width: 100%;
+        }
+      }
+    </style>
+    <style>
+      .list-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 24px 0 10px;
+      }
+      .list-title:first-of-type {
+        margin-top: 8px;
+      }
+      .list-title h2 {
+        font-size: 18px;
+        margin: 0;
+      }
+      .count {
+        background: #183b59;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 5px 10px;
+        color: #bfe2ff;
+        font-size: 12px;
+        font-weight: 800;
+      }
+      .released-title {
+        border-top: 1px solid var(--line);
+        padding-top: 24px;
+      }
+      .released-table {
+        opacity: 0.94;
+      }
+      @keyframes urgentPulse {
+        0%,
+        100% {
+          background: #3a1115;
+          box-shadow: inset 4px 0 #ff3b30;
+        }
+        50% {
+          background: #8c1d24;
+          box-shadow:
+            inset 7px 0 #ff6b61,
+            0 0 18px #ff3b304d;
+        }
+      }
+      tr.urgent {
+        animation: urgentPulse 1.15s ease-in-out infinite;
+      }
+      tr.urgent td {
+        border-bottom-color: #b93c42;
+      }
+      .urgent-label {
+        display: inline-block;
+        margin-top: 5px;
+        padding: 3px 7px;
+        border-radius: 999px;
+        background: #ff3b30;
+        color: #fff;
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: 0.04em;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        tr.urgent {
+          animation: none;
+          background: #5c171c;
+          box-shadow: inset 5px 0 #ff3b30;
+        }
+      }
+      .pending-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 270px;
+        gap: 24px;
+        align-items: start;
+      }
+      th small {
+        display: inline-block;
+        margin-top: 4px;
+        color: #7fb4da;
+        font-size: 10px;
+        font-weight: 700;
+      }
+      .brand h1,
+      .list-title h2,
+      .chart-title {
+        line-height: 1.3;
+      }
+      .wrap {
+        max-width: 1580px;
+        padding-inline: clamp(14px, 2.2vw, 32px);
+      }
+      .filter-card {
+        padding: 16px;
+        margin-bottom: 20px;
+      }
+      .filter-card .filters {
+        grid-template-columns:
+          minmax(260px, 2fr) repeat(2, minmax(150px, 1fr))
+          minmax(140px, 0.8fr);
+        margin: 0;
+      }
+      .pending-card {
+        min-width: 0;
+      }
+      .pending-card .tablewrap {
+        max-height: 520px;
+      }
+      .pending-card table {
+        min-width: 860px;
+      }
+      .side-chart {
+        display: block;
+        position: sticky;
+        top: 104px;
+        max-width: none;
+        margin: 0;
+        padding: 22px;
+      }
+      .side-chart .pie {
+        width: min(190px, 100%);
+        margin: 6px auto 22px;
+      }
+      .side-chart .legend {
+        grid-template-columns: 1fr;
+        max-height: 300px;
+        overflow: auto;
+      }
+      .side-chart .legend-item span {
+        display: block;
+        margin-top: 2px;
+        line-height: 1.35;
+      }
+      .side-chart .legend-item .part-value {
+        color: #7fe0ad;
+        font-weight: 800;
+      }
+      .side-chart .chart-title {
+        font-size: 18px;
+        line-height: 1.25;
+      }
+      .side-chart .chart-subtitle {
+        line-height: 1.45;
+      }
+      .released-card {
+        margin-top: 18px;
+        width: calc(100% - 294px);
+      }
+      .released-card .released-title {
+        margin-top: 0;
+        border-top: 0;
+        padding-top: 0;
+      }
+      @media (max-width: 1050px) {
+        .released-card {
+          width: 100%;
+        }
+        .filter-card .filters {
+          grid-template-columns: 1fr 1fr;
+        }
+        .pending-layout {
+          grid-template-columns: 1fr;
+        }
+        .side-chart {
+          position: static;
+          display: grid;
+          grid-template-columns: 210px minmax(0, 1fr);
+          align-items: center;
+        }
+        .side-chart .pie {
+          margin: auto;
+        }
+        .side-chart .legend {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          max-height: none;
+        }
+      }
+      @media (max-width: 700px) {
+        .filter-card .filters {
+          grid-template-columns: 1fr;
+        }
+        .side-chart {
+          display: block;
+        }
+        .side-chart .legend {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+  
+<style id="trilingual-styles">
+  .header-right{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:14px;
+    flex-wrap:wrap;
+  }
+  .lang-switch{
+    display:flex;
+    gap:6px;
+    padding:5px;
+    border:1px solid var(--line);
+    border-radius:12px;
+    background:#091b2d;
+    box-shadow:0 8px 24px #0003;
+  }
+  .lang-btn{
+    border:1px solid transparent;
+    border-radius:8px;
+    padding:8px 10px;
+    background:transparent;
+    color:var(--muted);
+    font-size:12px;
+    font-weight:850;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .lang-btn:hover{color:var(--text);background:#16334f}
+  .lang-btn.active{
+    color:#fff;
+    background:linear-gradient(135deg,var(--blue),#36a7ff);
+    box-shadow:0 4px 12px #2188ff40;
+  }
+  @media(max-width:760px){
+    .top{align-items:flex-start;gap:14px;flex-wrap:wrap}
+    .header-right{width:100%;justify-content:space-between}
+    .lang-switch{order:2}
+    .status{order:1}
+  }
+</style>
+
+
+<style id="hpm-header-redesign">
+  :root{
+    --hpm-navy:#0b2d50;
+    --hpm-navy2:#123e69;
+    --hpm-red:#d7263d;
+  }
+  .top{
+    position:sticky;
+    top:0;
+    z-index:50;
+    padding:0;
+    color:#fff;
+    background:linear-gradient(120deg,rgba(9,37,66,.96),rgba(13,62,109,.92));
+    border-bottom:1px solid rgba(255,255,255,.18);
+    box-shadow:0 12px 35px rgba(4,22,39,.30);
+    backdrop-filter:blur(16px);
+    -webkit-backdrop-filter:blur(16px);
+  }
+  .top-inner{
+    max-width:1580px;
+    margin:0 auto;
+    padding:12px clamp(16px,2.2vw,32px) 13px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    min-width:0;
+  }
+  .logo-box{
+    width:188px;
+    height:64px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(255,255,255,.96);
+    border:1px solid rgba(255,255,255,.78);
+    border-radius:10px;
+    box-shadow:0 10px 26px rgba(0,0,0,.20);
+    flex:0 0 auto;
+    overflow:hidden;
+  }
+  .logo-box img{
+    max-width:174px;
+    max-height:52px;
+    display:block;
+  }
+  .title-wrap{min-width:0}
+  .top .brand h1{
+    margin:0;
+    color:#fff;
+    font-size:clamp(18px,2vw,24px);
+    line-height:1.25;
+    font-weight:900;
+    letter-spacing:.1px;
+  }
+  .top .brand p{
+    margin:5px 0 0;
+    color:#eef6ff;
+    opacity:.94;
+    font-size:14px;
+  }
+  .hpm-chip{
+    display:inline-flex;
+    align-items:center;
+    background:var(--hpm-red);
+    color:#fff;
+    font-size:11px;
+    font-weight:950;
+    letter-spacing:.7px;
+    padding:4px 9px;
+    border-radius:5px;
+    margin-right:9px;
+    vertical-align:middle;
+  }
+  .header-right{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:14px;
+    flex:0 0 auto;
+  }
+  .lang-switch{
+    display:flex;
+    gap:5px;
+    background:rgba(255,255,255,.10);
+    border:1px solid rgba(255,255,255,.16);
+    padding:5px;
+    border-radius:11px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
+  }
+  .lang-btn{
+    border:none;
+    background:transparent;
+    color:#d8e8f8;
+    font-weight:900;
+    font-size:12px;
+    padding:8px 13px;
+    border-radius:8px;
+    cursor:pointer;
+    transition:.18s;
+    white-space:nowrap;
+  }
+  .lang-btn.active{
+    background:var(--hpm-red);
+    color:#fff;
+    box-shadow:0 6px 16px rgba(217,45,53,.30);
+  }
+  .lang-btn:not(.active):hover{
+    background:rgba(255,255,255,.14);
+    color:#fff;
+  }
+  .top .status{
+    color:#d8e8f8;
+    font-size:12px;
+    white-space:nowrap;
+  }
+  @media(max-width:900px){
+    .top-inner{align-items:flex-start;flex-wrap:wrap}
+    .header-right{margin-left:auto}
+  }
+  @media(max-width:720px){
+    .top{position:static}
+    .top-inner{flex-direction:column;align-items:stretch;gap:10px}
+    .brand{
+      display:grid;
+      grid-template-columns:128px minmax(0,1fr);
+      gap:10px;
+    }
+    .logo-box{width:128px;height:46px}
+    .logo-box img{max-width:118px;max-height:38px}
+    .top .brand h1{font-size:15px}
+    .top .brand p{font-size:12px}
+    .header-right{
+      width:100%;
+      margin-left:0;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+    .lang-switch{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      min-width:220px;
+    }
+    .lang-btn{min-height:38px;padding:7px 10px}
+  }
+</style>
+
+
+<style id="quarantine-traffic-light-styles">
+  .traffic-cell{min-width:150px}
+  .traffic-wrap{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .traffic-light{
+    width:22px;
+    height:60px;
+    border-radius:12px;
+    padding:4px;
+    background:#08131f;
+    border:1px solid #294862;
+    box-shadow:inset 0 0 0 1px #0006,0 6px 16px #0004;
+    display:grid;
+    grid-template-rows:repeat(3,1fr);
+    gap:3px;
+    flex:0 0 auto;
+  }
+  .traffic-light i{
+    display:block;
+    width:100%;
+    aspect-ratio:1;
+    border-radius:50%;
+    background:#25384a;
+    box-shadow:inset 0 0 0 1px #ffffff0f;
+  }
+  .traffic-light.green i:nth-child(3){
+    background:#32d583;
+    box-shadow:0 0 12px #32d583aa;
+  }
+  .traffic-light.yellow i:nth-child(2){
+    background:#fdb022;
+    box-shadow:0 0 12px #fdb022aa;
+  }
+  .traffic-light.red i:nth-child(1){
+    background:#f04438;
+    box-shadow:0 0 12px #f04438aa;
+  }
+  .traffic-text b{
+    display:block;
+    font-size:12px;
+    margin-bottom:3px;
+  }
+  .traffic-text span{
+    display:block;
+    font-size:11px;
+    color:var(--muted);
+    line-height:1.35;
+  }
+  tr.deadline-row{
+    box-shadow:inset 4px 0 #f04438;
+  }
+  tr.warning-row{
+    box-shadow:inset 4px 0 #fdb022;
+  }
+  tr.entry-row{
+    box-shadow:inset 4px 0 #32d583;
+  }
+</style>
+
+
+<style id="delete-record-styles">
+  .row-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .deleteBtn{
+    border:1px solid #8d3439;border-radius:12px;padding:12px 14px;
+    background:#542528;color:#ffd8d5;font-weight:850;cursor:pointer
+  }
+  .deleteBtn:hover{background:#702b31;border-color:#c64a52}
+  .delete-warning{
+    margin:12px 0 16px;padding:12px 14px;border-radius:12px;
+    background:#4b2024;border:1px solid #8d3439;color:#ffd8d5;
+    font-size:13px;line-height:1.45
+  }
+  .delete-error{margin-top:10px;color:#ffaaa5;font-size:12px;font-weight:800}
+  #confirmDeleteButton:disabled{opacity:.55;cursor:not-allowed}
+</style>
+
+<style id="github-navigation-styles">
+  .app-navigation{
+    max-width:1580px;
+    margin:18px auto 0;
+    padding:0 clamp(14px,2.2vw,32px);
+    display:flex;
+    justify-content:flex-start;
+  }
+  .app-navigation a{
+    display:inline-flex;
+    align-items:center;
+    gap:9px;
+    padding:11px 16px;
+    border-radius:12px;
+    background:#16334f;
+    border:1px solid var(--line);
+    color:#e8f5ff;
+    text-decoration:none;
+    font-weight:850;
+    box-shadow:0 8px 22px #0003;
+  }
+  .app-navigation a:hover{
+    background:#1d466b;
+    transform:translateY(-1px);
+  }
+</style>
+
+
+<script id="github-firebase-environment">
+  window.QUARANTINE_APP = Object.freeze({
+    checklist: "./quarantine_checklist.html",
+    dashboard: "./quarantine_dashboard.html",
+    collection: "cuarentena_gp12",
+    environment:
+      location.protocol === "file:"
+        ? "local"
+        : location.hostname.endsWith("github.io")
+          ? "github-pages"
+          : "web"
+  });
+</script>
+
+</head>
+  <body>
+    
+<header class="top">
+  <div class="top-inner">
+    <div class="brand">
+      <div class="logo-box"><img src="data:image/png;base64,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" alt="Hyundai Polytech México"></div>
+      <div class="title-wrap">
+        <h1><span class="hpm-chip">HPM</span><span data-header-title data-i18n-key="Dashboard Gestión de Cuarentena Planta 1">Dashboard Gestión de Cuarentena Planta 1</span></h1>
+        <p><span data-header-subtitle>Hyundai Polytech de México · Seguimiento, disposición y liberación</span></p>
+      </div>
+    </div>
+    <div class="header-right">
+      
+  <div class="lang-switch" role="group" aria-label="Language selector">
+    <button type="button" class="lang-btn" data-lang="es">ES</button>
+    <button type="button" class="lang-btn" data-lang="en">EN</button>
+    <button type="button" class="lang-btn" data-lang="ko">한국어</button>
+  </div>
+  <div class="status">
+
+        <i class="dot" id="dot"></i><span id="conn">Conectando…</span>
+      </div>
+      
+    </div>
+  </div>
+</header>
+
+<div class="app-navigation">
+  <a id="goChecklist" href="./quarantine_checklist.html">
+    <span aria-hidden="true">←</span>
+    <span>Ir al Registro de Cuarentena</span>
+  </a>
+</div>
+
+
+    <main class="wrap">
+      <section class="kpis">
+        <div class="kpi">
+          <b id="kValue">$0.00</b
+          ><span>Valor acumulado retenido (USD) / 보류 누적 금액</span
+          ><small id="kValueNote" class="muted"></small>
+        </div>
+        <div class="kpi">
+          <b id="kTotal">0</b><span>Total de registros / 총 등록 건수</span>
+        </div>
+        <div class="kpi">
+          <b id="kOpen">0</b><span>Material activo / 보류 중 자재</span>
+        </div>
+        <div class="kpi">
+          <b id="kQty">0</b><span>Piezas aún retenidas / 현재 보류 수량</span>
+        </div>
+        <div class="kpi">
+          <b id="kAge">0</b><span>Con más de 3 días / 3일 초과</span>
+        </div>
+      </section>
+      <section class="card filter-card">
+        <div class="filters">
+          <input
+            id="search"
+            placeholder="Buscar parte, responsable o motivo / 부품번호, 담당자 또는 사유 검색"
+          /><select id="fStatus">
+            <option value="">Todos los estatus / 전체 상태</option>
+            <option value="CUARENTENA">CUARENTENA / 격리</option>
+            <option value="LIBERADO PARCIAL">
+              LIBERADO PARCIAL / 부분 출고
+            </option>
+            <option value="LIBERADO">LIBERADO / 출고 완료</option>
+            <option value="RETRABAJO">RETRABAJO / 재작업</option>
+            <option value="RECHAZADO">RECHAZADO / 반려</option></select
+          ><select id="fTurn">
+            <option value="">Todos los turnos / 전체 근무조</option>
+            <option value="Día">Día / 주간</option>
+            <option value="Noche">Noche / 야간</option></select
+          ><button class="ghost" id="exportar">
+            Exportar CSV / CSV 내보내기
+          </button>
+        </div>
+      </section>
+      <div class="pending-layout">
+        <section class="card pending-card">
+          <div class="list-title">
+            <h2>
+              ⚠ Material en cuarentena pendiente de disposición / 처리 대기 중인
+              격리 자재
+            </h2>
+            <span class="count" id="pendingCount">0 registros</span>
+          </div>
+          <div class="tablewrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>
+                    Folio / antigüedad<br /><small>관리번호 / 경과일</small>
+                  </th>
+                  <th class="traffic-cell">Semáforo de disposición<br /><small>Disposition traffic light / 처리 신호등</small></th>
+                  <th>Producto<br /><small>품목</small></th>
+                  <th>Cantidades<br /><small>수량</small></th>
+                  <th>Responsable<br /><small>담당자</small></th>
+                  <th>Motivo<br /><small>사유</small></th>
+                  <th>Estatus actual<br /><small>현재 상태</small></th>
+                  <th>Acción<br /><small>작업</small></th>
+                </tr>
+              </thead>
+              <tbody id="rowsPending"></tbody>
+            </table>
+          </div>
+        </section>
+        <section class="card chart-panel side-chart">
+          <div>
+            <div
+              id="productPie"
+              class="pie"
+              role="img"
+              aria-label="Gráfica de piezas retenidas por producto"
+            ></div>
+          </div>
+          <div>
+            <h2 class="chart-title">
+              Distribución de productos retenidos / 보류 품목 분포
+            </h2>
+            <p class="chart-subtitle">
+              Piezas pendientes por número de parte · principales productos y
+              resto acumulado / 품번별 보류 수량
+            </p>
+            <div id="pieLegend" class="legend"></div>
+          </div>
+        </section>
+      </div>
+      <section class="card released-card">
+        <div class="list-title released-title">
+          <h2>✓ Historial de material liberado / 출고 자재 이력</h2>
+          <span class="count" id="releasedCount">0 liberados</span>
+        </div>
+        <div class="tablewrap released-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Folio / fecha<br /><small>관리번호 / 날짜</small></th>
+                <th>Producto<br /><small>품목</small></th>
+                <th>Cantidad liberada<br /><small>출고 수량</small></th>
+                <th>Autorizó<br /><small>승인자</small></th>
+                <th>Responsable de salida<br /><small>출고 담당자</small></th>
+                <th>Motivo de liberación<br /><small>출고 사유</small></th>
+                <th>Estatus actual<br /><small>현재 상태</small></th>
+              </tr>
+            </thead>
+            <tbody id="rowsReleased"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+    
+    <div id="deleteModal" class="modal hidden">
+      <form id="deleteForm" class="card">
+        <h2 style="margin-top:0">Eliminar registro</h2>
+        <p id="deleteSelected" class="muted"></p>
+        <div class="delete-warning">
+          Esta acción eliminará permanentemente el registro seleccionado y no se puede deshacer.
+        </div>
+        <input type="hidden" id="deleteRid" />
+        <div>
+          <label>Contraseña de autorización *</label>
+          <input id="deletePassword" type="password" required
+            autocomplete="current-password" placeholder="Ingresa la contraseña" />
+          <div id="deleteError" class="delete-error hidden">Contraseña incorrecta.</div>
+<div id="deleteStatus" class="muted hidden" style="margin-top:10px"></div>
+        </div>
+        <div class="actions">
+          <button type="button" class="ghost" id="cancelDelete">Cancelar</button>
+          <button type="submit" class="danger" id="confirmDeleteButton">Eliminar definitivamente</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="modal" class="modal hidden">
+      <form id="manage" class="card">
+        <h2 style="margin-top: 0">
+          Actualizar disposición / 처리 상태 업데이트
+        </h2>
+        <p id="selected" class="muted"></p>
+        <input type="hidden" id="rid" />
+        <div class="grid">
+          <div>
+            <label>Nuevo estatus / 새 상태 *</label
+            ><select id="newStatus" required>
+              <option value="">Seleccionar / 선택</option>
+              <option value="LIBERADO">LIBERADO / 출고 완료</option>
+              <option value="RETRABAJO">RETRABAJO / 재작업</option>
+              <option value="RECHAZADO">RECHAZADO / 반려</option>
+              <option value="CUARENTENA">CUARENTENA / 격리</option>
+            </select>
+          </div>
+          <div>
+            <label>Responsable de la decisión / 결정 담당자 *</label
+            ><input id="decisionBy" required />
+          </div>
+          <div class="full">
+            <label>Comentarios de disposición / 처리 의견 *</label
+            ><textarea id="decisionNote" required></textarea>
+          </div>
+        </div>
+        <div class="actions">
+          <button type="button" class="ghost" id="cancel">
+            Cancelar / 취소</button
+          ><button class="primary">Guardar cambio / 변경 저장</button>
+        </div>
+      </form>
+    </div>
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyA1gMgGe8WX9RPE2sNwCGQiNpbxiUx5bug",
+        authDomain: "registro-cuarentena.firebaseapp.com",
+        projectId: "registro-cuarentena",
+        storageBucket: "registro-cuarentena.firebasestorage.app",
+        messagingSenderId: "478761313614",
+        appId: "1:478761313614:web:05bdecb0d911af3f006a1f",
+        measurementId: "G-4L9M0ZGK0J",
+      };
+      const COLLECTION = "cuarentena_gp12",
+        LOCAL = "cuarentena_gp12_local";
+      let cloud = false,
+        db;
+      async function startDB() {
+        // Los archivos abiertos directamente con file:// se ejecutan como
+        // orígenes aislados. En ese modo evitamos inicializar Firebase para
+        // impedir errores de seguridad del navegador y usamos almacenamiento local.
+        if (window.location.protocol === "file:") {
+          cloud = false;
+          setConnection(false);
+          return;
+        }
+
+        try {
+          if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+          }
+
+          db = firebase.firestore();
+await db.collection(COLLECTION).limit(1).get();
+          cloud = true;
+          setConnection(true);
+        } catch (e) {
+          console.warn("Firebase no disponible; se utilizará modo local.", e);
+          cloud = false;
+          setConnection(false);
+        }
+      }
+      function localRows() {
+        try {
+          return JSON.parse(localStorage.getItem(LOCAL) || "[]");
+        } catch {
+          return [];
+        }
+      }
+      function saveLocal(rows) {
+        localStorage.setItem(LOCAL, JSON.stringify(rows));
+        window.dispatchEvent(new Event("quarantine-updated"));
+      }
+      async function addRecord(row) {
+        if (cloud) {
+          await db.collection(COLLECTION).doc(row.id).set(row);
+        } else {
+          const a = localRows();
+          a.unshift(row);
+          saveLocal(a);
+        }
+      }
+      async function updateRecord(id, changes) {
+        if (cloud) {
+          await db.collection(COLLECTION).doc(id).update(changes);
+        } else {
+          saveLocal(
+            localRows().map((x) => (x.id === id ? { ...x, ...changes } : x)),
+          );
+        }
+      }
+      async function deleteRecord(id) {
+        if (!cloud) {
+          saveLocal(localRows().filter((x) => x.id !== id));
+          return { mode: "local-delete" };
+        }
+
+        const ref = db.collection(COLLECTION).doc(id);
+
+        try {
+          await ref.delete();
+          return { mode: "firestore-delete" };
+        } catch (error) {
+          if (
+            error?.code === "permission-denied" ||
+            String(error?.message || "").toLowerCase().includes("permission")
+          ) {
+            await ref.update({
+              eliminado: true,
+              eliminadoEn: new Date().toISOString(),
+              eliminadoPor: "Autorización 3508",
+            });
+            return { mode: "soft-delete" };
+          }
+          throw error;
+        }
+      }
+      async function getRecords() {
+        if (cloud) {
+          const s = await db
+            .collection(COLLECTION)
+            .orderBy("creadoEn", "desc")
+            .get();
+          return s.docs.map((d) => d.data());
+        }
+        return localRows();
+      }
+      function watchRecords(handler) {
+        if (cloud) {
+          return db
+            .collection(COLLECTION)
+            .orderBy("creadoEn", "desc")
+            .onSnapshot(
+              (s) => {
+                setConnection(true);
+                handler(s.docs.map((d) => d.data()));
+              },
+              () => setConnection(false),
+            );
+        }
+        const refresh = () => handler(localRows());
+        refresh();
+        window.addEventListener("storage", refresh);
+        window.addEventListener("quarantine-updated", refresh);
+        return () => {
+          window.removeEventListener("storage", refresh);
+          window.removeEventListener("quarantine-updated", refresh);
+        };
+      }
+
+      const priceMap = {
+        10787001: 0,
+        14913601: 0,
+        15294401: 0,
+        15378401: 0,
+        15418804: 0,
+        17870901: 0,
+        18608203: 0,
+        201014001: 0,
+        "4H58570120": 0.217,
+        "8A1224": 0.0508,
+        AA59135300: 1.1,
+        AB58563300: 2.33,
+        AT56555000: 1.33,
+        AT56555090: 1.33,
+        AT56555091: 1.33,
+        BB46202502: 0,
+        BB46202503: 0,
+        BB46202504: 0.908,
+        BB46202505: 0.922,
+        BB61502000: 0.191,
+        BB61502800: 0.191,
+        BC710A1100: 1.1977,
+        BC710A2100: 1.3095,
+        BC710A2300: 1.4691,
+        BC710A2500: 1.2699161996851795,
+        BC710A2600: 1.32975,
+        BC711A1100: 1.1977,
+        BC711A2100: 0,
+        BC711A2300: 1.4691,
+        BC711A2500: 1.2699161996851795,
+        BC711A2600: 1.32975,
+        BC718A1101: 0.3349,
+        BC718A2500: 0.26626342721188095,
+        BC719A1101: 0.3349,
+        BC719A2500: 0.26626342721188095,
+        BC742A2500: 0.3325370402486421,
+        BC743A2500: 0.3325370402486421,
+        BC750A1100: 1.2523,
+        BC751A2500: 0,
+        BC755A2500: 0.6483,
+        BC757A1700: 0.6483,
+        BC771A1100: 0.9667,
+        BC771A2400: 0.9498,
+        BC771A2600: 0.97515,
+        BC92114010: 2,
+        BC92114020: 2,
+        BH9003BC00: 1.159,
+        BH9003Z100: 0,
+        BM33105900: 0,
+        BM33107900: 1.95,
+        BM33108200: 1.864,
+        BM331A3500: 2.099,
+        BM341A7900: 1.9,
+        BM34605400: 0.077,
+        BM34605700: 0.134,
+        BM346A1500: 0,
+        C559135250: 1.02,
+        GE52100L00: 0.515,
+        GL689BC200: 0.158,
+        GL770A1200: 1.024,
+        GL771B3200: 1.078,
+        GL771BC000: 0.854,
+        GL771N4000: 0.837,
+        GM441B2102: 0,
+        GM441N5000: 3.681,
+        GM49533300: 0.057,
+        GP25501700: 0,
+        GP25501900: 0,
+        GP255A2700: 0.146,
+        GP274A1900: 0.4539,
+        GP274A3300: 0.5484,
+        GP274A3400: 0.4435,
+        GP274A4470: 0.4975,
+        GP274A5300: 0.45349999999999996,
+        GP274S1900: 0.4539,
+        GP27865U00: 0,
+        GP371A2200: 0,
+        GP371A7450: 2.138,
+        GP371D5000: 0.905,
+        GP373A2900: 1.9,
+        GP373A3000: 1.9,
+        GP373B3500: 0.965,
+        GP92400300: 0.10599999999999998,
+        GP92400400: 0.093,
+        GR25501400: 0.108,
+        GR28712200: 0,
+        L158563000: 1.9,
+        M658563000: 2.16,
+        N958563000: 2.48,
+        P256555500: 1.63,
+        P256565000: 0.64,
+        Q558570100: 0.303,
+        Q558570220: 0.242,
+        R192114010: 2,
+        R192114020: 2,
+        R556354AA0: 0.241,
+        S156565000: 1.34,
+        SH280A1401: 0,
+        SH280A1601: 0.404,
+        SH285A1201: 0.228,
+        SH285A1401: 0.294,
+        SH285A1601: 0.6,
+        SH325A0101: 0.14509999999999998,
+        SH325A1101: 0.063,
+        SH380A1501: 0.516,
+        SH380A2201: 0.677,
+        SH380A2501: 0.913,
+        SH380A2701: 0.627,
+        SH385A0701: 0.744,
+        SH385A3801: 0.6,
+        SH385D3701: 0,
+        SH385D3801: 0,
+        SH425A0101: 0.112,
+        SK22500101: 0.062200000000000005,
+        SK280A1701: 0,
+        SK283A2701: 0.472,
+        SK285A1601: 0.6,
+        SK325A1201: 0.086,
+        SK380A0101: 0.671,
+        SK383A0101: 0.47,
+        SK383A8701: 0.556,
+        SK42500101: 0.15889999999999999,
+        SK435A9500: 0,
+        SK485A2201: 0.591,
+        SK485A9501: 0.449,
+        SS425A0101: 0.135,
+        SS425A0201: 0.134,
+        SU385A1101: 0.335,
+        SV32500101: 0.262,
+        SV32500102: 0.0911,
+        SZ342A0101: 0.26,
+        SZ342A1801: 0,
+        SZ342A2001: 0,
+        SZ342A6501: 0.38,
+        SZ342A6502: 0.38,
+        SZ342A6503: 0.38,
+        SZ342A6504: 0.38,
+        SZ433A7801: 2.973,
+        SZ433B6501: 5.667,
+        SZ433C2801: 0,
+        SZ433C3401: 2.577,
+        SZ433C5501: 0,
+        SZ434A3501: 0.37,
+        SZ434B6501: 0.214,
+        SZ434C1201: 0.222,
+        SZ434C1601: 0.16970000000000002,
+        SZ437A2001: 1.755,
+        SZ437A2002Z1: 1.7550000000000001,
+        SZ437A2003Z1: 1.7550000000000001,
+        SZ437A2004: 0.9099999999999999,
+        SZ437A2005: 0,
+        SZ437A2101: 1.0286,
+        SZ437A2102: 0,
+        SZ437A2103: 1.0286,
+        SZ437A2104: 1.0286,
+        SZ437A2105: 1.0286,
+        SZ437A2106: 1.0286,
+        SZ437A2107: 1.0286,
+        SZ437A2201: 0.5211,
+        SZ437B7901: 1.7550000000000001,
+        SZ440B9502: 0.04,
+        SZ440C5702: 0.173,
+        SZ440C7102: 0.173,
+        SZ441A0301: 0.3798,
+        SZ441A0801: 0.34590000000000004,
+        SZ441B9501: 1.0622,
+        SZ441C6201: 0.7966000000000001,
+        SZ442A0801: 0.8086,
+        SZ442A6101: 0.4978,
+        SZ442A9602: 0.7194999999999999,
+        SZ442A9801: 0.7029,
+        SZ442B6501: 0.7505999999999999,
+        SZ442B9501: 0,
+        SZ442C2801: 0,
+        SZ442C4303: 1.0235999999999998,
+        SZ442C4801: 0.8278,
+        SZ442C4803: 0.8588,
+        SZ442C6701: 1.1273,
+        SZ442C6702: 1.1758,
+        SZ442C8701: 0.8218,
+        SZ442C8801: 0.8199,
+        SZ444B4601: 0.7414,
+        SZ444C2901: 5.0858,
+        SZ444C3001: 5.056,
+        SZ444C3301: 0.7414,
+        SZ444C3501: 0.7414,
+        SZ46005201: 0.571,
+        SZ460A0401: 0.571,
+        SZ460A0501: 0.643,
+        SZ460A0701: 0,
+        SZ460A0801: 0.556,
+        SZ460A7101: 0.64,
+        SZ460C3401: 0.655,
+        SZ460C8801: 0.662,
+        SZ929A1101: 0.284,
+        SZ929A3801: 0,
+      };
+      const validReferencePrices = Object.values(priceMap)
+        .map(Number)
+        .filter((value) => Number.isFinite(value) && value > 0);
+      const averageReferencePrice = validReferencePrices.length
+        ? validReferencePrices.reduce((sum, value) => sum + value, 0) /
+          validReferencePrices.length
+        : 0;
+
+      const getReferencePrice = (record) => {
+        const directPrice = Number(record?.pu ?? priceMap[record?.numeroParte] ?? 0);
+        return directPrice > 0 ? directPrice : averageReferencePrice;
+      };
+
+      let data = [],
+        view = [];
+      function setConnection(ok) {
+        dot.className = "dot " + (ok ? "on" : "");
+        conn.textContent = ok
+          ? "Actualización en vivo activa / 실시간 업데이트 활성"
+          : "Modo local en este equipo / 이 기기의 로컬 모드";
+      }
+      const statusKo = {
+        CUARENTENA: "격리",
+        "LIBERADO PARCIAL": "부분 출고",
+        LIBERADO: "출고 완료",
+        RETRABAJO: "재작업",
+        RECHAZADO: "반려",
+      };
+      const statusLabel = (status) =>
+        status + (statusKo[status] ? " / " + statusKo[status] : "");
+      const money = new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+      });
+      const pieColors = [
+        "#2188ff",
+        "#32d583",
+        "#fdb022",
+        "#f97066",
+        "#9b8afb",
+        "#5bc0ff",
+        "#64748b",
+      ];
+      function renderPie(active, remainingQuantity) {
+        const totals = {};
+        active.forEach((x) => {
+          const q = remainingQuantity(x);
+          if (q > 0) {
+            const part = x.numeroParte || "SIN NÚMERO";
+            const pu = getReferencePrice(x);
+            totals[part] ||= { qty: 0, value: 0 };
+            totals[part].qty += q;
+            totals[part].value += q * pu;
+          }
+        });
+        let items = Object.entries(totals).sort((a, b) => b[1].qty - a[1].qty),
+          top = items.slice(0, 6),
+          other = items.slice(6).reduce(
+            (a, x) => ({
+              qty: a.qty + x[1].qty,
+              value: a.value + x[1].value,
+            }),
+            { qty: 0, value: 0 },
+          );
+        if (other.qty) top.push(["OTROS", other]);
+        const total = top.reduce((a, x) => a + x[1].qty, 0);
+        if (!total) {
+          productPie.style.background = "#16334f";
+          pieLegend.innerHTML =
+            '<span class="muted">No hay piezas retenidas / 보류 수량이 없습니다.</span>';
+          return;
+        }
+        let at = 0,
+          stops = [];
+        top.forEach((x, i) => {
+          const end = at + (x[1].qty / total) * 360;
+          stops.push(pieColors[i] + " " + at + "deg " + end + "deg");
+          at = end;
+        });
+        productPie.style.background = "conic-gradient(" + stops.join(",") + ")";
+        pieLegend.innerHTML = top
+          .map(
+            (x, i) =>
+              '<div class="legend-item"><i class="swatch" style="background:' +
+              pieColors[i] +
+              '"></i><div><b>' +
+              esc(x[0]) +
+              "</b><span>" +
+              x[1].qty.toLocaleString("es-MX") +
+              " pzas. / 개 · " +
+              Math.round((x[1].qty / total) * 100) +
+              '%</span><span class="part-value">' +
+              money.format(x[1].value) +
+              " retenidos / 보류 금액</span></div></div>",
+          )
+          .join("");
+      }
+      const esc = (s) =>
+        String(s ?? "").replace(
+          /[&<>"']/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            })[c],
+        );
+      const days = (x) =>
+        Math.max(
+          0,
+          Math.floor((Date.now() - new Date(x).getTime()) / 86400000),
+        );
+      function trafficStatus(createdAt) {
+        const age = days(createdAt);
+        if (age <= 0) {
+          return {
+            color: "green",
+            rowClass: "entry-row",
+            title: "Día 1 · Ingreso",
+            detail: "Material recién ingresado",
+          };
+        }
+        if (age === 1) {
+          return {
+            color: "yellow",
+            rowClass: "warning-row",
+            title: "Día 2 · Alerta",
+            detail: "Solicitar disposición",
+          };
+        }
+        return {
+          color: "red",
+          rowClass: "deadline-row",
+          title: age === 2 ? "Día 3 · Fecha límite" : "Vencido · Disposición urgente",
+          detail: age === 2 ? "Último día para disponer" : `${age + 1} días desde el ingreso`,
+        };
+      }
+      function remainingQuantity(record) {
+        return Math.max(
+          0,
+          Number(record?.cantidad || 0) -
+            Number(record?.cantidadLiberada || 0),
+        );
+      }
+
+      function render() {
+        const q = search.value.trim().toLowerCase();
+        view = data.filter(
+          (x) =>
+            (!fStatus.value || x.estatus === fStatus.value) &&
+            (!fTurn.value || x.turno === fTurn.value) &&
+            (!q ||
+              [
+                x.numeroParte,
+                x.modelo,
+                x.descripcion,
+                x.familia,
+                x.area,
+                x.motivo,
+                x.responsable,
+                x.motivoLiberacion,
+                x.autorizaSalida,
+                x.responsableSalida,
+              ]
+                .join(" ")
+                .toLowerCase()
+                .includes(q)),
+        );
+        const pending = view
+            .filter((x) => x.estatus !== "LIBERADO")
+            .sort((a, b) => new Date(a.creadoEn) - new Date(b.creadoEn)),
+          released = view
+            .filter((x) => x.estatus === "LIBERADO")
+            .sort(
+              (a, b) =>
+                new Date(b.actualizadoEn || b.creadoEn) -
+                new Date(a.actualizadoEn || a.creadoEn),
+            );
+        const active = data.filter((x) =>
+          ["CUARENTENA", "LIBERADO PARCIAL", "RETRABAJO"].includes(x.estatus),
+        );
+        const retainedValue = active.reduce(
+            (sum, x) => sum + remainingQuantity(x) * getReferencePrice(x),
+            0,
+          ),
+          missingPrice = active.filter(
+            (x) => remainingQuantity(x) > 0 && !Number(x.pu ?? priceMap[x.numeroParte] ?? 0),
+          ).length;
+        kValue.textContent = money.format(retainedValue);
+        kValueNote.textContent = missingPrice
+          ? "Valor de Referencia, Sin PU en BOM"
+          : "";
+        renderPie(active, remainingQuantity);
+        kTotal.textContent = data.length;
+        kOpen.textContent = data.filter((x) =>
+          ["CUARENTENA", "LIBERADO PARCIAL", "RETRABAJO"].includes(x.estatus),
+        ).length;
+        kQty.textContent = data
+          .filter((x) =>
+            ["CUARENTENA", "LIBERADO PARCIAL", "RETRABAJO"].includes(x.estatus),
+          )
+          .reduce((a, x) => a + remainingQuantity(x), 0)
+          .toLocaleString("es-MX");
+        kAge.textContent = data.filter(
+          (x) =>
+            ["CUARENTENA", "LIBERADO PARCIAL"].includes(x.estatus) &&
+            days(x.creadoEn) > 3,
+        ).length;
+        pendingCount.textContent = pending.length + " registros / 건";
+        releasedCount.textContent = released.length + " liberados / 출고";
+        rowsPending.innerHTML = pending.length
+          ? pending
+              .map(
+                (x) =>
+                  (() => {
+                    const traffic = trafficStatus(x.creadoEn);
+                    return '<tr class="' +
+                  traffic.rowClass +
+                  (days(x.creadoEn) > 2 ? " urgent" : "") +
+                  '"><td><strong>' +
+                  esc(x.id.slice(0, 8).toUpperCase()) +
+                  '</strong><span class="muted">' +
+                  days(x.creadoEn) +
+                  " día(s) / 일</span>" +
+                  (days(x.creadoEn) > 3
+                    ? '<span class="urgent-label">⚠ SEGUIMIENTO URGENTE / 긴급 추적</span>'
+                    : "") +
+                  "</td><td class=\"traffic-cell\"><div class=\"traffic-wrap\"><div class=\"traffic-light " +
+                  traffic.color +
+                  "\"><i></i><i></i><i></i></div><div class=\"traffic-text\"><b>" +
+                  esc(traffic.title) +
+                  "</b><span>" +
+                  esc(traffic.detail) +
+                  "</span></div></div></td><td><strong>" +
+                  esc(x.numeroParte) +
+                  '</strong><span class="muted">Modelo / 모델: ' +
+                  esc(x.modelo) +
+                  '</span><br><span class="muted">Descripción / 설명: ' +
+                  esc(x.descripcion) +
+                  "</span>" +
+                  (x.familia || x.area
+                    ? '<span class="muted">Familia / 제품군: ' +
+                      esc(x.familia || "—") +
+                      " · Área / 부문: " +
+                      esc(x.area || "—") +
+                      "</span>"
+                    : "") +
+                  "</td><td><strong>" +
+                  remainingQuantity(x) +
+                  ' retenidas / 보류</strong><span class="muted">' +
+                  esc(x.cantidadLiberada || 0) +
+                  " liberadas / 출고 · total " +
+                  esc(x.cantidad) +
+                  "</span></td><td>" +
+                  esc(x.responsable) +
+                  '<br><span class="muted">#' +
+                  esc(x.empleado) +
+                  " · " +
+                  esc(x.turno) +
+                  "</span></td><td>" +
+                  esc(x.motivo) +
+                  '</td><td><span class="pill ' +
+                  esc(x.estatus) +
+                  '">' +
+                  esc(statusLabel(x.estatus)) +
+                  '</span></td><td><div class="row-actions"><button type="button" class="ghost manageBtn" data-id="' +
+                  esc(x.id) +
+                  '">Gestionar / 관리</button><button type="button" class="deleteBtn" data-id="' +
+                  esc(x.id) +
+                  '">Eliminar</button></div></td></tr>';
+                  })(),
+              )
+              .join("")
+          : '<tr><td colspan="8" class="empty">No hay material pendiente / 대기 중인 자재가 없습니다.</td></tr>';
+        rowsReleased.innerHTML = released.length
+          ? released
+              .map(
+                (x) =>
+                  "<tr><td><strong>" +
+                  esc(x.id.slice(0, 8).toUpperCase()) +
+                  '</strong><span class="muted">' +
+                  new Date(x.actualizadoEn || x.creadoEn).toLocaleDateString(
+                    "es-MX",
+                  ) +
+                  "</span></td><td><strong>" +
+                  esc(x.numeroParte) +
+                  '</strong><span class="muted">Modelo / 모델: ' +
+                  esc(x.modelo) +
+                  '</span><br><span class="muted">Descripción / 설명: ' +
+                  esc(x.descripcion) +
+                  "</span>" +
+                  (x.familia || x.area
+                    ? '<span class="muted">Familia / 제품군: ' +
+                      esc(x.familia || "—") +
+                      " · Área / 부문: " +
+                      esc(x.area || "—") +
+                      "</span>"
+                    : "") +
+                  "</td><td><strong>" +
+                  esc(x.cantidadLiberada || x.cantidad) +
+                  " pzas.</strong></td><td>" +
+                  esc(x.autorizaSalida || x.responsableDecision || "—") +
+                  "</td><td>" +
+                  esc(x.responsableSalida || "—") +
+                  "</td><td>" +
+                  esc(x.motivoLiberacion || x.disposicion || "—") +
+                  '</td><td><span class="pill LIBERADO">LIBERADO / 출고 완료</span></td></tr>',
+              )
+              .join("")
+          : '<tr><td colspan="7" class="empty">Todavía no hay material liberado / 출고 완료 자재가 없습니다.</td></tr>';
+      }
+      async function load() {
+        data = await getRecords();
+        render();
+      }
+      function applyLive(all) {
+        data = all.filter((x) => x.eliminado !== true);
+        render();
+      }
+      function openManage(id) {
+        const x = data.find((v) => v.id === id);
+        rid.value = id;
+        selected.textContent =
+          x.numeroParte +
+          " · Estatus actual / 현재 상태: " +
+          statusLabel(x.estatus);
+        newStatus.value = "";
+        decisionBy.value = "";
+        decisionNote.value = "";
+        modal.classList.remove("hidden");
+      }
+      [search, fStatus, fTurn].forEach((x) =>
+        x.addEventListener("input", render),
+      );
+      const deleteModalElement = document.getElementById("deleteModal");
+      const deleteFormElement = document.getElementById("deleteForm");
+      const deleteRidElement = document.getElementById("deleteRid");
+      const deleteSelectedElement = document.getElementById("deleteSelected");
+      const deletePasswordElement = document.getElementById("deletePassword");
+      const deleteErrorElement = document.getElementById("deleteError");
+      const cancelDeleteElement = document.getElementById("cancelDelete");
+      const deleteStatusElement = document.getElementById("deleteStatus");
+      const confirmDeleteButtonElement = document.getElementById("confirmDeleteButton");
+
+      rowsPending.addEventListener("click", (e) => {
+        const manageButton = e.target.closest(".manageBtn");
+        if (manageButton) {
+          openManage(manageButton.dataset.id);
+          return;
+        }
+
+        const deleteButton = e.target.closest(".deleteBtn");
+        if (!deleteButton) return;
+
+        const x = data.find((v) => v.id === deleteButton.dataset.id);
+        if (!x) return;
+
+        deleteRidElement.value = x.id;
+        deleteSelectedElement.textContent =
+          x.numeroParte + " · " + remainingQuantity(x) + " retenidas / 보류";
+        deletePasswordElement.value = "";
+        deleteErrorElement.classList.add("hidden");
+        deleteStatusElement.classList.add("hidden");
+        deleteStatusElement.textContent = "";
+        confirmDeleteButtonElement.disabled = false;
+        deleteModalElement.classList.remove("hidden");
+        setTimeout(() => deletePasswordElement.focus(), 0);
+      });
+
+      cancelDeleteElement.onclick = () => {
+        deleteModalElement.classList.add("hidden");
+        deleteFormElement.reset();
+        deleteErrorElement.classList.add("hidden");
+      };
+
+      deleteModalElement.addEventListener("click", (e) => {
+        if (e.target === deleteModalElement) cancelDeleteElement.click();
+      });
+
+      deleteFormElement.onsubmit = async (e) => {
+        e.preventDefault();
+        deleteErrorElement.classList.add("hidden");
+        deleteStatusElement.classList.add("hidden");
+
+        if (deletePasswordElement.value.trim() !== "3508") {
+          deleteErrorElement.classList.remove("hidden");
+          deletePasswordElement.select();
+          return;
+        }
+
+        const id = deleteRidElement.value;
+        const record = data.find((v) => v.id === id);
+
+        if (!record) {
+          deleteStatusElement.textContent =
+            "El registro ya no está disponible. Actualiza la página.";
+          deleteStatusElement.classList.remove("hidden");
+          return;
+        }
+
+        confirmDeleteButtonElement.disabled = true;
+        deletePasswordElement.disabled = true;
+        deleteStatusElement.textContent = "Eliminando registro…";
+        deleteStatusElement.classList.remove("hidden");
+
+        try {
+          const result = await deleteRecord(id);
+
+          deleteStatusElement.textContent =
+            result.mode === "soft-delete"
+              ? "Registro retirado del Dashboard. Firebase no permitió borrado físico."
+              : "Registro eliminado correctamente.";
+
+          if (!cloud) applyLive(localRows());
+
+          setTimeout(() => {
+            deleteModalElement.classList.add("hidden");
+            deleteFormElement.reset();
+            deletePasswordElement.disabled = false;
+            confirmDeleteButtonElement.disabled = false;
+            deleteStatusElement.classList.add("hidden");
+          }, 700);
+        } catch (error) {
+          console.error("No fue posible eliminar el registro.", error);
+          deletePasswordElement.disabled = false;
+          confirmDeleteButtonElement.disabled = false;
+          deleteStatusElement.textContent =
+            "No fue posible eliminar el registro: " +
+            (error?.message || error?.code || "Error desconocido");
+          deleteStatusElement.classList.remove("hidden");
+        }
+      };
+      cancel.onclick = () => modal.classList.add("hidden");
+      manage.onsubmit = async (e) => {
+        e.preventDefault();
+        const x = data.find((v) => v.id === rid.value),
+          h = [
+            ...(x.historial || []),
+            {
+              estatus: newStatus.value,
+              fecha: new Date().toISOString(),
+              responsable: decisionBy.value.trim(),
+              comentario: decisionNote.value.trim(),
+            },
+          ];
+        await updateRecord(rid.value, {
+          estatus: newStatus.value,
+          disposicion: decisionNote.value.trim(),
+          responsableDecision: decisionBy.value.trim(),
+          actualizadoEn: new Date().toISOString(),
+          historial: h,
+        });
+        modal.classList.add("hidden");
+        await load();
+      };
+      exportar.onclick = () => {
+        const cols = [
+          "id",
+          "fecha",
+          "turno",
+          "numeroParte",
+          "modelo",
+          "descripcion",
+          "cantidad",
+          "cantidadLiberada",
+          "cantidadRestante",
+          "responsable",
+          "empleado",
+          "motivo",
+          "estatus",
+          "motivoLiberacion",
+          "autorizaSalida",
+          "responsableSalida",
+          "disposicion",
+        ];
+        const csv =
+          "﻿" +
+          [
+            cols.join(","),
+            ...view.map((x) =>
+              cols
+                .map(
+                  (c) => '"' + String(x[c] ?? "").replaceAll('"', '""') + '"',
+                )
+                .join(","),
+            ),
+          ].join("\n");
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+        a.download = "cuarentena_gp12.csv";
+        a.click();
+        URL.revokeObjectURL(a.href);
+      };
+      startDB().then(() => watchRecords(applyLive));
+    </script>
+  
+<script id="trilingual-engine">
+(() => {
+  const LANG_KEY = "gp12_ui_language";
+  const T = {
+    "Control de cuarentena / 격리 관리": {es:"Control de cuarentena", en:"Quarantine Control", ko:"격리 관리"},
+    "Control de Cuarentena GP12": {es:"Control de Cuarentena GP12", en:"GP12 Quarantine Control", ko:"GP12 격리 관리"},
+    "Hyundai Polytech de México · Registro y liberación de material": {es:"Hyundai Polytech de México · Registro y liberación de material", en:"Hyundai Polytech Mexico · Material registration and release", ko:"현대폴리텍 멕시코 · 자재 등록 및 출고"},
+    "Dashboard de cuarentena / 격리 관리 대시보드": {es:"Dashboard de cuarentena", en:"Quarantine Dashboard", ko:"격리 관리 대시보드"},
+    "Dashboard Gestión de Cuarentena Planta 1": {es:"Dashboard Gestión de Cuarentena Planta 1", en:"Plant 1 Quarantine Management Dashboard", ko:"1공장 격리 관리 대시보드"},
+    "Hyundai Polytech de México · Seguimiento, disposición y liberación": {es:"Hyundai Polytech de México · Seguimiento, disposición y liberación", en:"Hyundai Polytech Mexico · Tracking, disposition and release", ko:"현대폴리텍 멕시코 · 추적, 처리 및 출고"},
+    "GP12 · Registro y liberación de material / 자재 등록 및 출고": {es:"GP12 · Registro y liberación de material", en:"GP12 · Material registration and release", ko:"GP12 · 자재 등록 및 출고"},
+    "Seguimiento, disposición y liberación / 추적·처리·출고": {es:"Seguimiento, disposición y liberación", en:"Tracking, disposition and release", ko:"추적·처리·출고"},
+    "Conectando / 연결 중…": {es:"Conectando…", en:"Connecting…", ko:"연결 중…"},
+    "Conectando…": {es:"Conectando…", en:"Connecting…", ko:"연결 중…"},
+    "Actualización en vivo activa / 실시간 업데이트 활성": {es:"Actualización en vivo activa", en:"Live updates active", ko:"실시간 업데이트 활성"},
+    "Modo local en este equipo / 이 기기의 로컬 모드": {es:"Modo local en este equipo", en:"Local mode on this device", ko:"이 기기의 로컬 모드"},
+
+    "Registro de material / 자재 등록": {es:"Registro de material", en:"Material Registration", ko:"자재 등록"},
+    "Liberación de material / 자재 출고": {es:"Liberación de material", en:"Material Release", ko:"자재 출고"},
+    "Responsable del producto / 제품 담당자 *": {es:"Responsable del producto *", en:"Product owner *", ko:"제품 담당자 *"},
+    "Número de empleado / 사번 *": {es:"Número de empleado *", en:"Employee number *", ko:"사번 *"},
+    "Fecha / 날짜 *": {es:"Fecha *", en:"Date *", ko:"날짜 *"},
+    "Turno / 근무조 *": {es:"Turno *", en:"Shift *", ko:"근무조 *"},
+    "Seleccionar / 선택": {es:"Seleccionar", en:"Select", ko:"선택"},
+    "Día / 주간": {es:"Día", en:"Day", ko:"주간"},
+    "Noche / 야간": {es:"Noche", en:"Night", ko:"야간"},
+    "Número de parte / 품번 *": {es:"Número de parte *", en:"Part number *", ko:"품번 *"},
+    "＋ Agregar otro producto / 다른 품목 추가": {es:"＋ Agregar otro producto", en:"＋ Add another product", ko:"＋ 다른 품목 추가"},
+    "Modelo / 모델": {es:"Modelo", en:"Model", ko:"모델"},
+    "Descripción / 설명": {es:"Descripción", en:"Description", ko:"설명"},
+    "Cantidad / 수량 *": {es:"Cantidad *", en:"Quantity *", ko:"수량 *"},
+    "Motivo de cuarentena / 격리 사유 *": {es:"Motivo de cuarentena *", en:"Quarantine reason *", ko:"격리 사유 *"},
+    "Limpiar / 초기화": {es:"Limpiar", en:"Clear", ko:"초기화"},
+    "Registrar en cuarentena / 격리 등록": {es:"Registrar en cuarentena", en:"Register in quarantine", ko:"격리 등록"},
+    "Material en cuarentena / 격리 자재 *": {es:"Material en cuarentena *", en:"Quarantined material *", ko:"격리 자재 *"},
+    "Cantidad a liberar / 출고 수량 *": {es:"Cantidad a liberar *", en:"Quantity to release *", ko:"출고 수량 *"},
+    "Quién autoriza la salida / 출고 승인자 *": {es:"Quién autoriza la salida *", en:"Release authorized by *", ko:"출고 승인자 *"},
+    "Responsable de salida del material / 자재 출고 담당자 *": {es:"Responsable de salida del material *", en:"Material release owner *", ko:"자재 출고 담당자 *"},
+    "Motivo de liberación / 출고 사유 *": {es:"Motivo de liberación *", en:"Release reason *", ko:"출고 사유 *"},
+    "Liberar material / 자재 출고": {es:"Liberar material", en:"Release material", ko:"자재 출고"},
+    "Agregar otro producto / 다른 품목 추가": {es:"Agregar otro producto", en:"Add another product", ko:"다른 품목 추가"},
+    "Esta opción está protegida para evitar cambios no autorizados. / 무단 변경 방지를 위해 보호된 기능입니다.": {es:"Esta opción está protegida para evitar cambios no autorizados.", en:"This option is protected to prevent unauthorized changes.", ko:"무단 변경 방지를 위해 보호된 기능입니다."},
+    "Contraseña de autorización / 승인 비밀번호 *": {es:"Contraseña de autorización *", en:"Authorization password *", ko:"승인 비밀번호 *"},
+    "Número de parte nuevo / 신규 품번 *": {es:"Número de parte nuevo *", en:"New part number *", ko:"신규 품번 *"},
+    "Modelo / 모델 *": {es:"Modelo *", en:"Model *", ko:"모델 *"},
+    "Descripción del producto / 제품 설명 *": {es:"Descripción del producto *", en:"Product description *", ko:"제품 설명 *"},
+    "Cancelar / 취소": {es:"Cancelar", en:"Cancel", ko:"취소"},
+    "Autorizar y agregar / 승인 후 추가": {es:"Autorizar y agregar", en:"Authorize and add", ko:"승인 후 추가"},
+
+    "Valor de Referencia, Sin PU en BOM": {es:"Valor de Referencia, Sin PU en BOM", en:"Reference Value, No Unit Price in BOM", ko:"참고값 적용, BOM 단가 없음"},
+    "Valor acumulado retenido (USD) / 보류 누적 금액": {es:"Valor acumulado retenido (USD)", en:"Accumulated retained value (USD)", ko:"보류 누적 금액 (USD)"},
+    "Total de registros / 총 등록 건수": {es:"Total de registros", en:"Total records", ko:"총 등록 건수"},
+    "Material activo / 보류 중 자재": {es:"Material activo", en:"Active material", ko:"보류 중 자재"},
+    "Piezas aún retenidas / 현재 보류 수량": {es:"Piezas aún retenidas", en:"Pieces still retained", ko:"현재 보류 수량"},
+    "Con más de 3 días / 3일 초과": {es:"Con más de 3 días", en:"Older than 3 days", ko:"3일 초과"},
+    "Todos los estatus / 전체 상태": {es:"Todos los estatus", en:"All statuses", ko:"전체 상태"},
+    "CUARENTENA / 격리": {es:"CUARENTENA", en:"QUARANTINE", ko:"격리"},
+    "LIBERADO PARCIAL / 부분 출고": {es:"LIBERADO PARCIAL", en:"PARTIALLY RELEASED", ko:"부분 출고"},
+    "LIBERADO / 출고 완료": {es:"LIBERADO", en:"RELEASED", ko:"출고 완료"},
+    "RETRABAJO / 재작업": {es:"RETRABAJO", en:"REWORK", ko:"재작업"},
+    "RECHAZADO / 반려": {es:"RECHAZADO", en:"REJECTED", ko:"반려"},
+    "Todos los turnos / 전체 근무조": {es:"Todos los turnos", en:"All shifts", ko:"전체 근무조"},
+    "Exportar CSV / CSV 내보내기": {es:"Exportar CSV", en:"Export CSV", ko:"CSV 내보내기"},
+    "⚠ Material en cuarentena pendiente de disposición / 처리 대기 중인 격리 자재": {es:"⚠ Material en cuarentena pendiente de disposición", en:"⚠ Quarantined material pending disposition", ko:"⚠ 처리 대기 중인 격리 자재"},
+    "Folio / antigüedad": {es:"Folio / antigüedad", en:"Record / age", ko:"관리번호 / 경과일"},
+    "관리번호 / 경과일": {es:"", en:"", ko:""},
+    "Producto": {es:"Producto", en:"Product", ko:"품목"},
+    "품목": {es:"", en:"", ko:""},
+    "Cantidades": {es:"Cantidades", en:"Quantities", ko:"수량"},
+    "수량": {es:"", en:"", ko:""},
+    "Responsable": {es:"Responsable", en:"Owner", ko:"담당자"},
+    "담당자": {es:"", en:"", ko:""},
+    "Motivo": {es:"Motivo", en:"Reason", ko:"사유"},
+    "사유": {es:"", en:"", ko:""},
+    "Estatus actual": {es:"Estatus actual", en:"Current status", ko:"현재 상태"},
+    "현재 상태": {es:"", en:"", ko:""},
+    "Acción": {es:"Acción", en:"Action", ko:"작업"},
+    "작업": {es:"", en:"", ko:""},
+    "Distribución de productos retenidos / 보류 품목 분포": {es:"Distribución de productos retenidos", en:"Distribution of retained products", ko:"보류 품목 분포"},
+    "Piezas pendientes por número de parte · principales productos y resto acumulado / 품번별 보류 수량": {es:"Piezas pendientes por número de parte · principales productos y resto acumulado", en:"Pending pieces by part number · main products and accumulated remainder", ko:"품번별 보류 수량 · 주요 품목 및 기타 누적"},
+    "✓ Historial de material liberado / 출고 자재 이력": {es:"✓ Historial de material liberado", en:"✓ Released material history", ko:"✓ 출고 자재 이력"},
+    "Folio / fecha": {es:"Folio / fecha", en:"Record / date", ko:"관리번호 / 날짜"},
+    "관리번호 / 날짜": {es:"", en:"", ko:""},
+    "Cantidad liberada": {es:"Cantidad liberada", en:"Released quantity", ko:"출고 수량"},
+    "출고 수량": {es:"", en:"", ko:""},
+    "Autorizó": {es:"Autorizó", en:"Authorized by", ko:"승인자"},
+    "승인자": {es:"", en:"", ko:""},
+    "Responsable de salida": {es:"Responsable de salida", en:"Release owner", ko:"출고 담당자"},
+    "출고 담당자": {es:"", en:"", ko:""},
+    "Motivo de liberación": {es:"Motivo de liberación", en:"Release reason", ko:"출고 사유"},
+    "출고 사유": {es:"", en:"", ko:""},
+    "Actualizar disposición / 처리 상태 업데이트": {es:"Actualizar disposición", en:"Update disposition", ko:"처리 상태 업데이트"},
+    "Nuevo estatus / 새 상태 *": {es:"Nuevo estatus *", en:"New status *", ko:"새 상태 *"},
+    "Responsable de la decisión / 결정 담당자 *": {es:"Responsable de la decisión *", en:"Decision owner *", ko:"결정 담당자 *"},
+    "Comentarios de disposición / 처리 의견 *": {es:"Comentarios de disposición *", en:"Disposition comments *", ko:"처리 의견 *"},
+    "Eliminar": {es:"Eliminar", en:"Delete", ko:"삭제"},
+    "Eliminar registro": {es:"Eliminar registro", en:"Delete record", ko:"기록 삭제"},
+    "Esta acción eliminará permanentemente el registro seleccionado y no se puede deshacer.": {es:"Esta acción eliminará permanentemente el registro seleccionado y no se puede deshacer.", en:"This action will permanently delete the selected record and cannot be undone.", ko:"선택한 기록이 영구적으로 삭제되며 되돌릴 수 없습니다."},
+    "Contraseña de autorización *": {es:"Contraseña de autorización *", en:"Authorization password *", ko:"승인 비밀번호 *"},
+    "Ingresa la contraseña": {es:"Ingresa la contraseña", en:"Enter the password", ko:"비밀번호 입력"},
+    "Contraseña incorrecta.": {es:"Contraseña incorrecta.", en:"Incorrect password.", ko:"비밀번호가 올바르지 않습니다."},
+    "Eliminar definitivamente": {es:"Eliminar definitivamente", en:"Delete permanently", ko:"영구 삭제"},
+    "Ir al Registro de Cuarentena": {es:"Ir al Registro de Cuarentena", en:"Go to Quarantine Registration", ko:"격리 등록으로 이동"},
+    "Guardar cambio / 변경 저장": {es:"Guardar cambio", en:"Save change", ko:"변경 저장"},
+    "Gestionar / 관리": {es:"Gestionar", en:"Manage", ko:"관리"},
+    "No hay material pendiente / 대기 중인 자재가 없습니다.": {es:"No hay material pendiente.", en:"There is no pending material.", ko:"대기 중인 자재가 없습니다."},
+    "Todavía no hay material liberado / 출고 완료 자재가 없습니다.": {es:"Todavía no hay material liberado.", en:"There is no released material yet.", ko:"출고 완료 자재가 없습니다."},
+    "No hay piezas retenidas / 보류 수량이 없습니다.": {es:"No hay piezas retenidas.", en:"There are no retained pieces.", ko:"보류 수량이 없습니다."},
+    "Semáforo de disposición": {es:"Semáforo de disposición", en:"Disposition traffic light", ko:"처리 신호등"},
+    "Disposition traffic light / 처리 신호등": {es:"", en:"", ko:""},
+    "Día 1 · Ingreso": {es:"Día 1 · Ingreso", en:"Day 1 · Entry", ko:"1일차 · 입고"},
+    "Material recién ingresado": {es:"Material recién ingresado", en:"Material just entered", ko:"신규 입고 자재"},
+    "Día 2 · Alerta": {es:"Día 2 · Alerta", en:"Day 2 · Alert", ko:"2일차 · 경고"},
+    "Solicitar disposición": {es:"Solicitar disposición", en:"Request disposition", ko:"처리 결정 요청"},
+    "Día 3 · Fecha límite": {es:"Día 3 · Fecha límite", en:"Day 3 · Deadline", ko:"3일차 · 처리 기한"},
+    "Último día para disponer": {es:"Último día para disponer", en:"Last day for disposition", ko:"처리 최종일"},
+    "Vencido · Disposición urgente": {es:"Vencido · Disposición urgente", en:"Overdue · Urgent disposition", ko:"기한 초과 · 긴급 처리"},
+    "⚠ SEGUIMIENTO URGENTE / 긴급 추적": {es:"⚠ SEGUIMIENTO URGENTE", en:"⚠ URGENT FOLLOW-UP", ko:"⚠ 긴급 추적"}
+  };
+
+  const PH = {
+    "Nombre completo / 성명": {es:"Nombre completo", en:"Full name", ko:"성명"},
+    "Ej. 10524": {es:"Ej. 10524", en:"E.g. 10524", ko:"예: 10524"},
+    "Escribe o selecciona el número / 품번 입력 또는 선택": {es:"Escribe o selecciona el número", en:"Enter or select the part number", ko:"품번 입력 또는 선택"},
+    "Describe claramente el defecto o condición encontrada / 발견된 결함 또는 상태를 설명하세요": {es:"Describe claramente el defecto o condición encontrada", en:"Clearly describe the defect or condition found", ko:"발견된 결함 또는 상태를 설명하세요"},
+    "Describe el motivo o disposición autorizada / 승인된 출고 사유를 설명하세요": {es:"Describe el motivo o disposición autorizada", en:"Describe the authorized reason or disposition", ko:"승인된 출고 사유를 설명하세요"},
+    "Ingresa la contraseña / 비밀번호 입력": {es:"Ingresa la contraseña", en:"Enter the password", ko:"비밀번호 입력"},
+    "Buscar parte, responsable o motivo / 부품번호, 담당자 또는 사유 검색": {es:"Buscar parte, responsable o motivo", en:"Search part, owner or reason", ko:"부품번호, 담당자 또는 사유 검색"}
+  };
+
+  let currentLang = localStorage.getItem(LANG_KEY) || "es";
+
+  function normalize(s){ return String(s || "").replace(/\s+/g," ").trim(); }
+
+  function translatePattern(text, lang){
+    let m;
+    if ((m = text.match(/^(\d+)\s+registros\s*\/\s*건$/i)))
+      return lang==="es" ? `${m[1]} registros` : lang==="en" ? `${m[1]} records` : `${m[1]}건`;
+    if ((m = text.match(/^(\d+)\s+liberados\s*\/\s*출고$/i)))
+      return lang==="es" ? `${m[1]} liberados` : lang==="en" ? `${m[1]} released` : `${m[1]}건 출고`;
+    if ((m = text.match(/^(\d+)\s+día\(s\)\s*\/\s*일$/i)))
+      return lang==="es" ? `${m[1]} día(s)` : lang==="en" ? `${m[1]} day(s)` : `${m[1]}일`;
+    if ((m = text.match(/^(\d+)\s+retenidas\s*\/\s*보류$/i)))
+      return lang==="es" ? `${m[1]} retenidas` : lang==="en" ? `${m[1]} retained` : `${m[1]}개 보류`;
+    if ((m = text.match(/^(\d+)\s+liberadas\s*\/\s*출고\s*·\s*total\s*(\d+)$/i)))
+      return lang==="es" ? `${m[1]} liberadas · total ${m[2]}` : lang==="en" ? `${m[1]} released · total ${m[2]}` : `${m[1]}개 출고 · 총 ${m[2]}개`;
+    if ((m = text.match(/^(\d+)\s+pzas\.\s*\/\s*개\s*·\s*(\d+)%$/i)))
+      return lang==="es" ? `${m[1]} pzas. · ${m[2]}%` : lang==="en" ? `${m[1]} pcs. · ${m[2]}%` : `${m[1]}개 · ${m[2]}%`;
+    if ((m = text.match(/^\$(.+)\s+retenidos\s*\/\s*보류 금액$/i)))
+      return lang==="es" ? `$${m[1]} retenidos` : lang==="en" ? `$${m[1]} retained` : `$${m[1]} 보류 금액`;
+    if ((m = text.match(/^(\d+)\s+registro\(s\)\s+sin PU en BOM\s*\/\s*BOM 단가 누락$/i)))
+      return lang==="es" ? `${m[1]} registro(s) sin PU en BOM` : lang==="en" ? `${m[1]} record(s) without unit price in BOM` : `BOM 단가 누락 ${m[1]}건`;
+    if ((m = text.match(/^Cantidad original\s*\/\s*최초 수량:\s*(\d+)\s*·\s*Liberada\s*\/\s*출고:\s*(\d+)\s*·\s*Disponible\s*\/\s*가능:\s*(\d+)$/i)))
+      return lang==="es" ? `Cantidad original: ${m[1]} · Liberada: ${m[2]} · Disponible: ${m[3]}` :
+             lang==="en" ? `Original quantity: ${m[1]} · Released: ${m[2]} · Available: ${m[3]}` :
+             `최초 수량: ${m[1]} · 출고: ${m[2]} · 가능: ${m[3]}`;
+    if ((m = text.match(/^Modelo\s*\/\s*모델:\s*(.+)$/i)))
+      return lang==="es" ? `Modelo: ${m[1]}` : lang==="en" ? `Model: ${m[1]}` : `모델: ${m[1]}`;
+    if ((m = text.match(/^Descripción\s*\/\s*설명:\s*(.+)$/i)))
+      return lang==="es" ? `Descripción: ${m[1]}` : lang==="en" ? `Description: ${m[1]}` : `설명: ${m[1]}`;
+    if ((m = text.match(/^Familia\s*\/\s*제품군:\s*(.+)\s*·\s*Área\s*\/\s*부문:\s*(.+)$/i)))
+      return lang==="es" ? `Familia: ${m[1]} · Área: ${m[2]}` : lang==="en" ? `Family: ${m[1]} · Area: ${m[2]}` : `제품군: ${m[1]} · 부문: ${m[2]}`;
+    if ((m = text.match(/^Área\s*\/\s*부문:\s*(.+)\s*·\s*Cliente\s*\/\s*고객사:\s*(.+)$/i)))
+      return lang==="es" ? `Área: ${m[1]} · Cliente: ${m[2]}` : lang==="en" ? `Area: ${m[1]} · Customer: ${m[2]}` : `부문: ${m[1]} · 고객사: ${m[2]}`;
+    if ((m = text.match(/^Estatus actual\s*\/\s*현재 상태:\s*(.+)$/i)))
+      return lang==="es" ? `Estatus actual: ${m[1]}` : lang==="en" ? `Current status: ${m[1]}` : `현재 상태: ${m[1]}`;
+    return null;
+  }
+
+  function setTextNode(node, lang){
+    if (!node || !node.nodeValue) return;
+    if (!node.__i18nOriginal) node.__i18nOriginal = normalize(node.nodeValue);
+    const src = node.__i18nOriginal;
+    if (!src) return;
+    const exact = T[src]?.[lang];
+    const patterned = translatePattern(src, lang);
+    if (exact !== undefined) node.nodeValue = exact;
+    else if (patterned !== null) node.nodeValue = patterned;
+  }
+
+  function applyElement(el, lang){
+    if (!(el instanceof Element)) return;
+    if (el.matches("script,style")) return;
+
+    if (el.dataset && el.dataset.i18nKey && T[el.dataset.i18nKey]) {
+      el.textContent = T[el.dataset.i18nKey][lang];
+      return;
+    }
+
+    if (el.hasAttribute("placeholder")){
+      if (!el.dataset.i18nPlaceholder) el.dataset.i18nPlaceholder = el.getAttribute("placeholder");
+      const src = el.dataset.i18nPlaceholder;
+      if (PH[src]) el.setAttribute("placeholder", PH[src][lang]);
+    }
+    if (el.hasAttribute("aria-label")){
+      if (!el.dataset.i18nAria) el.dataset.i18nAria = el.getAttribute("aria-label");
+      const src = el.dataset.i18nAria;
+      const aria = {
+        "Gráfica de piezas retenidas por producto": {
+          es:"Gráfica de piezas retenidas por producto",
+          en:"Chart of retained pieces by product",
+          ko:"제품별 보류 수량 그래프"
+        }
+      };
+      if (aria[src]) el.setAttribute("aria-label", aria[src][lang]);
+    }
+    [...el.childNodes].forEach(n => {
+      if (n.nodeType === Node.TEXT_NODE) setTextNode(n, lang);
+      else if (n.nodeType === Node.ELEMENT_NODE) applyElement(n, lang);
+    });
+  }
+
+  function refreshHeaderTitleSource() {
+    const titleEl = document.querySelector("[data-header-title]");
+    if (titleEl) {
+      titleEl.dataset.i18nKey = "Dashboard Gestión de Cuarentena Planta 1";
+      titleEl.textContent = T["Dashboard Gestión de Cuarentena Planta 1"]?.[currentLang] || "Dashboard Gestión de Cuarentena Planta 1";
+    }
+  }
+
+  function setLanguage(lang){
+    currentLang = ["es","en","ko"].includes(lang) ? lang : "es";
+    refreshHeaderTitleSource();
+    localStorage.setItem(LANG_KEY, currentLang);
+    document.documentElement.lang = currentLang === "ko" ? "ko" : currentLang;
+    document.title = document.body?.querySelector(".pending-layout")
+      ? ({es:"Dashboard Gestión de Cuarentena Planta 1",en:"Plant 1 Quarantine Management Dashboard",ko:"1공장 격리 관리 대시보드"})[currentLang]
+      : ({es:"Registro de Cuarentena Planta 1",en:"Plant 1 Quarantine Registration",ko:"1공장 격리 등록"})[currentLang];
+
+    applyElement(document.body, currentLang);
+    document.querySelectorAll(".lang-btn").forEach(b => {
+      b.classList.toggle("active", b.dataset.lang === currentLang);
+      b.setAttribute("aria-pressed", b.dataset.lang === currentLang ? "true" : "false");
+    });
+
+    // Re-render dynamic dashboard content after language change.
+    if (typeof render === "function") {
+      try { render(); setTimeout(() => applyElement(document.body, currentLang), 0); } catch(_){}
+    }
+    if (typeof loadActive === "function" && !document.getElementById("releaseForm")?.classList.contains("hidden")) {
+      try { loadActive().then(() => applyElement(document.body, currentLang)); } catch(_){}
+    }
+  }
+
+  const observer = new MutationObserver(mutations => {
+    observer.disconnect();
+    for (const m of mutations) {
+      m.addedNodes.forEach(n => {
+        if (n.nodeType === Node.TEXT_NODE) setTextNode(n, currentLang);
+        else if (n.nodeType === Node.ELEMENT_NODE) applyElement(n, currentLang);
+      });
+      if (m.type === "characterData") setTextNode(m.target, currentLang);
+    }
+    observer.observe(document.body,{subtree:true,childList:true,characterData:true});
+  });
+
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".lang-btn").forEach(btn =>
+      btn.addEventListener("click", () => setLanguage(btn.dataset.lang))
+    );
+    setLanguage(currentLang);
+    observer.observe(document.body,{subtree:true,childList:true,characterData:true});
+  });
+
+  window.gp12SetLanguage = setLanguage;
+})();
+</script>
+
+</body>
+</html>
